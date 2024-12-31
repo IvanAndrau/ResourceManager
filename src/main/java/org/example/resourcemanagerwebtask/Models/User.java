@@ -6,18 +6,24 @@ import jakarta.persistence.GenerationType;
 @Entity
 @Table(name ="users")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
 public class User {
     @Id
-    @Column(name ="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name ="id")
     private Long userId;
+
     @Column(nullable = false)
     private String username;
+
     @Column(nullable = false)
     private String email;
+
     @Column(nullable = false)
     private String password;
+
+    @Column(name = "role", insertable = false, updatable = false)
+    private String role;
 
     public User() {}
 
@@ -57,5 +63,9 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
     }
 }

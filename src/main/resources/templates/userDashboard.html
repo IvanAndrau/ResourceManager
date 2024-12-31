@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #333;
+            padding: 15px;
+            color: white;
+            text-align: center;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+        }
+        .container {
+            padding: 20px;
+        }
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .crud-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .crud-table th, .crud-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        .crud-table th {
+            background-color: #f1f1f1;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .logout-btn {
+            background-color: #f44336;
+        }
+        .logout-btn:hover {
+            background-color: #e53935;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <h1>User Dashboard</h1>
+    <a href="javascript:void(0)">Home</a>
+    <a href="javascript:void(0)">Resources</a>
+    <a href="javascript:void(0)">Subscriptions</a>
+</div>
+
+<div class="container">
+    <h2 class="section-title">Resources Management</h2>
+    <button class="btn" onclick="showAddResourceForm()">Add Resource</button>
+    <table class="crud-table" id="resourcesTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Resource rows will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <h2 class="section-title">Subscriptions Management</h2>
+    <button class="btn" onclick="showAddSubscriptionForm()">Add Subscription</button>
+    <table class="crud-table" id="subscriptionsTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Resource</th>
+            <th>User</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Subscription rows will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <button class="btn logout-btn" onclick="logOut()">Log Out</button>
+</div>
+
+<script>
+    // Simulated data (in real-life, this will be fetched from the server)
+    const resources = [
+        { id: 1, name: "Resource 1", description: "Description 1" },
+        { id: 2, name: "Resource 2", description: "Description 2" },
+    ];
+    const subscriptions = [
+        { id: 1, resource: "Resource 1", user: "John Doe" },
+        { id: 2, resource: "Resource 2", user: "Jane Doe" },
+    ];
+
+    // Function to render resources
+    function renderResources() {
+        const tableBody = document.getElementById('resourcesTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';
+        resources.forEach(resource => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                    <td>${resource.id}</td>
+                    <td>${resource.name}</td>
+                    <td>${resource.description}</td>
+                    <td>
+                        <button class="btn" onclick="editResource(${resource.id})">Edit</button>
+                        <button class="btn" onclick="deleteResource(${resource.id})">Delete</button>
+                    </td>
+                `;
+        });
+    }
+
+    // Function to render subscriptions
+    function renderSubscriptions() {
+        const tableBody = document.getElementById('subscriptionsTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';
+        subscriptions.forEach(subscription => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                    <td>${subscription.id}</td>
+                    <td>${subscription.resource}</td>
+                    <td>${subscription.user}</td>
+                    <td>
+                        <button class="btn" onclick="editSubscription(${subscription.id})">Edit</button>
+                        <button class="btn" onclick="deleteSubscription(${subscription.id})">Delete</button>
+                    </td>
+                `;
+        });
+    }
+
+    // Add new resource
+    function showAddResourceForm() {
+        // Logic to show a form to add a new resource
+        alert('Show Add Resource Form');
+    }
+
+    // Edit resource
+    function editResource(id) {
+        // Logic to edit a resource
+        alert('Edit Resource: ' + id);
+    }
+
+    // Delete resource
+    function deleteResource(id) {
+        // Logic to delete a resource
+        const index = resources.findIndex(resource => resource.id === id);
+        if (index !== -1) {
+            resources.splice(index, 1);
+            renderResources(); // Re-render the resources list
+        }
+    }
+
+    // Add new subscription
+    function showAddSubscriptionForm() {
+        // Logic to show a form to add a new subscription
+        alert('Show Add Subscription Form');
+    }
+
+    // Edit subscription
+    function editSubscription(id) {
+        // Logic to edit a subscription
+        alert('Edit Subscription: ' + id);
+    }
+
+    // Delete subscription
+    function deleteSubscription(id) {
+        // Logic to delete a subscription
+        const index = subscriptions.findIndex(subscription => subscription.id === id);
+        if (index !== -1) {
+            subscriptions.splice(index, 1);
+            renderSubscriptions(); // Re-render the subscriptions list
+        }
+    }
+
+    // Log out
+    function logOut() {
+        // Logic for log out
+        alert('Logging out...');
+    }
+
+    // Initial render
+    renderResources();
+    renderSubscriptions();
+</script>
+</body>
+</html>
