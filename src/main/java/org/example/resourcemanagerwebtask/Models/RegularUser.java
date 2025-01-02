@@ -4,7 +4,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("user") // Now uses the "role" column
+@DiscriminatorValue("user")
 public class RegularUser extends User {
     public RegularUser() {}
 

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,6 +21,36 @@ public class UserService {
     {
         this.userRepository = userRepository;
     }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public void saveUser(User user) {
+        user.setPassword(hashPassword(user.getPassword()));
+        userRepository.save(user);
+    }
+
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public boolean updatePassword(Long userId, String newPassword) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            User existingUser = user.get();
+            existingUser.setPassword(hashPassword(newPassword));
+            userRepository.save(existingUser);
+            return true;
+        }
+        return false;
+    }
+
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
+
 
     public boolean registerUser(String username, String email, String password, String role) {
         if (userRepository.findByUsername(username).isPresent()) {
@@ -73,9 +104,5 @@ public class UserService {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Error hashing password", e);
         }
-    }
-
-    public static boolean verifyPassword(String plainPassword, String hashedPassword) {
-        return hashPassword(plainPassword).equals(hashedPassword);
     }
 }

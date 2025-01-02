@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
     <style>
+        /* General styles */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -12,16 +13,35 @@
             padding: 0;
         }
         .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             background-color: #333;
             padding: 15px;
             color: white;
-            text-align: center;
         }
-        .navbar a {
+        .navbar h1 {
+            margin: 0;
+        }
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .nav-links a {
             color: white;
             text-decoration: none;
             margin: 0 15px;
             font-size: 16px;
+        }
+        .navbar .logout-btn {
+            padding: 10px 20px;
+            background-color: #f44336;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        .navbar .logout-btn:hover {
+            background-color: #e53935;
         }
         .container {
             padding: 20px;
@@ -53,20 +73,49 @@
         .btn:hover {
             background-color: #45a049;
         }
-        .logout-btn {
-            background-color: #f44336;
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
         }
-        .logout-btn:hover {
-            background-color: #e53935;
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 400px;
+            text-align: center;
+        }
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .modal-content .btn {
+            width: 100%;
         }
     </style>
 </head>
 <body>
 <div class="navbar">
     <h1>User Dashboard</h1>
-    <a href="javascript:void(0)">Home</a>
-    <a href="javascript:void(0)">Resources</a>
-    <a href="javascript:void(0)">Subscriptions</a>
+    <div class="nav-links">
+        <a href="javascript:void(0)">Home</a>
+        <a href="javascript:void(0)">Resources</a>
+        <a href="javascript:void(0)">Subscriptions</a>
+        <button class="logout-btn" onclick="logOut()">Log Out</button>
+    </div>
 </div>
 
 <div class="container">
@@ -76,8 +125,9 @@
         <thead>
         <tr>
             <th>ID</th>
-            <th>Name</th>
-            <th>Description</th>
+            <th>Title</th>
+            <th>Username</th>
+            <th>Email</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -92,8 +142,9 @@
         <thead>
         <tr>
             <th>ID</th>
-            <th>Resource</th>
-            <th>User</th>
+            <th>Title</th>
+            <th>Cost</th>
+            <th>Renewal Date</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -101,110 +152,124 @@
         <!-- Subscription rows will be dynamically inserted here -->
         </tbody>
     </table>
+</div>
 
-    <button class="btn logout-btn" onclick="logOut()">Log Out</button>
+<!-- Add Resource Modal -->
+<div id="addResourceModal" class="modal">
+    <div class="modal-content">
+        <h2>Add Resource</h2>
+        <form id="addResourceForm">
+            <input type="text" id="resourceTitle" placeholder="Title" required>
+            <input type="text" id="resourceUsername" placeholder="Username" required>
+            <input type="password" id="resourcePassword" placeholder="Password" required>
+            <input type="email" id="resourceEmail" placeholder="Email" required>
+            <button type="button" class="btn" onclick="saveResource()">Save Resource</button>
+        </form>
+        <button class="btn" onclick="closeAddResourceForm()">Cancel</button>
+    </div>
+</div>
+
+<!-- Add Subscription Modal -->
+<div id="addSubscriptionModal" class="modal">
+    <div class="modal-content">
+        <h2>Add Subscription</h2>
+        <form id="addSubscriptionForm">
+            <input type="text" id="subscriptionTitle" placeholder="Title" required>
+            <input type="text" id="subscriptionUsername" placeholder="Username" required>
+            <input type="password" id="subscriptionPassword" placeholder="Password" required>
+            <input type="email" id="subscriptionEmail" placeholder="Email" required>
+            <input type="number" step="0.01" id="subscriptionCost" placeholder="Cost" required>
+            <input type="date" id="subscriptionRenewalDate" placeholder="Renewal Date" required>
+            <label>
+                <input type="checkbox" id="subscriptionAutoRenew"> Auto Renew
+            </label>
+            <button type="button" class="btn" onclick="saveSubscription()">Save Subscription</button>
+        </form>
+        <button class="btn" onclick="closeAddSubscriptionForm()">Cancel</button>
+    </div>
 </div>
 
 <script>
-    // Simulated data (in real-life, this will be fetched from the server)
-    const resources = [
-        { id: 1, name: "Resource 1", description: "Description 1" },
-        { id: 2, name: "Resource 2", description: "Description 2" },
-    ];
-    const subscriptions = [
-        { id: 1, resource: "Resource 1", user: "John Doe" },
-        { id: 2, resource: "Resource 2", user: "Jane Doe" },
-    ];
-
-    // Function to render resources
-    function renderResources() {
-        const tableBody = document.getElementById('resourcesTable').getElementsByTagName('tbody')[0];
-        tableBody.innerHTML = '';
-        resources.forEach(resource => {
-            const row = tableBody.insertRow();
-            row.innerHTML = `
-                    <td>${resource.id}</td>
-                    <td>${resource.name}</td>
-                    <td>${resource.description}</td>
-                    <td>
-                        <button class="btn" onclick="editResource(${resource.id})">Edit</button>
-                        <button class="btn" onclick="deleteResource(${resource.id})">Delete</button>
-                    </td>
-                `;
-        });
-    }
-
-    // Function to render subscriptions
-    function renderSubscriptions() {
-        const tableBody = document.getElementById('subscriptionsTable').getElementsByTagName('tbody')[0];
-        tableBody.innerHTML = '';
-        subscriptions.forEach(subscription => {
-            const row = tableBody.insertRow();
-            row.innerHTML = `
-                    <td>${subscription.id}</td>
-                    <td>${subscription.resource}</td>
-                    <td>${subscription.user}</td>
-                    <td>
-                        <button class="btn" onclick="editSubscription(${subscription.id})">Edit</button>
-                        <button class="btn" onclick="deleteSubscription(${subscription.id})">Delete</button>
-                    </td>
-                `;
-        });
-    }
-
-    // Add new resource
+    // Show Add Resource Form
     function showAddResourceForm() {
-        // Logic to show a form to add a new resource
-        alert('Show Add Resource Form');
+        document.getElementById('addResourceModal').style.display = 'flex';
     }
 
-    // Edit resource
-    function editResource(id) {
-        // Logic to edit a resource
-        alert('Edit Resource: ' + id);
+    // Close Add Resource Form
+    function closeAddResourceForm() {
+        document.getElementById('addResourceModal').style.display = 'none';
     }
 
-    // Delete resource
-    function deleteResource(id) {
-        // Logic to delete a resource
-        const index = resources.findIndex(resource => resource.id === id);
-        if (index !== -1) {
-            resources.splice(index, 1);
-            renderResources(); // Re-render the resources list
+    // Save Resource
+    async function saveResource() {
+        const title = document.getElementById('resourceTitle').value;
+        const username = document.getElementById('resourceUsername').value;
+        const password = document.getElementById('resourcePassword').value;
+        const email = document.getElementById('resourceEmail').value;
+
+        const resourceData = { title, username, password, email };
+
+        try {
+            const response = await fetch('/resources', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(resourceData)
+            });
+
+            if (response.ok) {
+                alert('Resource saved successfully!');
+                closeAddResourceForm();
+                // Reload data or update UI
+            } else {
+                alert('Failed to save resource');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error saving resource');
         }
     }
 
-    // Add new subscription
+    // Show Add Subscription Form
     function showAddSubscriptionForm() {
-        // Logic to show a form to add a new subscription
-        alert('Show Add Subscription Form');
+        document.getElementById('addSubscriptionModal').style.display = 'flex';
     }
 
-    // Edit subscription
-    function editSubscription(id) {
-        // Logic to edit a subscription
-        alert('Edit Subscription: ' + id);
+    // Close Add Subscription Form
+    function closeAddSubscriptionForm() {
+        document.getElementById('addSubscriptionModal').style.display = 'none';
     }
 
-    // Delete subscription
-    function deleteSubscription(id) {
-        // Logic to delete a subscription
-        const index = subscriptions.findIndex(subscription => subscription.id === id);
-        if (index !== -1) {
-            subscriptions.splice(index, 1);
-            renderSubscriptions(); // Re-render the subscriptions list
+    // Save Subscription
+    async function saveSubscription() {
+        const title = document.getElementById('subscriptionTitle').value;
+        const username = document.getElementById('subscriptionUsername').value;
+        const password = document.getElementById('subscriptionPassword').value;
+        const email = document.getElementById('subscriptionEmail').value;
+        const cost = parseFloat(document.getElementById('subscriptionCost').value);
+        const renewalDate = document.getElementById('subscriptionRenewalDate').value;
+        const autoRenew = document.getElementById('subscriptionAutoRenew').checked;
+
+        const subscriptionData = { title, username, password, email, cost, renewalDate, autoRenew };
+
+        try {
+            const response = await fetch('/subscriptions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(subscriptionData)
+            });
+
+            if (response.ok) {
+                alert('Subscription saved successfully!');
+                closeAddSubscriptionForm();
+                // Reload data or update UI
+            } else {
+                alert('Failed to save subscription');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error saving subscription');
         }
     }
-
-    // Log out
-    function logOut() {
-        // Logic for log out
-        alert('Logging out...');
-    }
-
-    // Initial render
-    renderResources();
-    renderSubscriptions();
 </script>
 </body>
 </html>

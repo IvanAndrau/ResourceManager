@@ -1,10 +1,195 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
 
+        .dashboard-body {
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+        }
+
+        .logout-button {
+            color: white;
+            text-decoration: none;
+            background-color: #f44336;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .dashboard-main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .primary-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .danger-button {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .success-message {
+            color: #4CAF50;
+        }
+
+        .error-message {
+            color: #f44336;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f2f2f2;
+        }
+
+        /* Inline Form */
+        .inline-form {
+            display: inline;
+        }
+
+    </style>
+</head>
+<body class="dashboard-body">
+<header class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+    <a href="/" class="logout-button">Logout</a>
+</header>
+
+<main class="dashboard-main">
+    <section class="card">
+        <h2>Create New User</h2>
+        <form action="/adminDashboard/createUser" method="post" class="form">
+            <label>Username:</label>
+            <input type="text" name="username" required class="input">
+            <label>Email:</label>
+            <input type="email" name="email" required class="input">
+            <label>Password:</label>
+            <input type="password" name="password" required class="input">
+            <button type="submit" class="button primary-button">Create</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>All Users</h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.userId}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.email}"></td>
+                <td>
+                    <form action="/adminDashboard/deleteUser" method="post" class="inline-form">
+                        <input type="hidden" name="userId" th:value="${user.userId}">
+                        <button type="submit" class="button danger-button">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- TODO: implement Find User by Username Section build in in the card which shows all users and sorts them according to the provided information (Id/Username)-->
+<!--    <section class="card">-->
+<!--        <h2>Find User by Username</h2>-->
+<!--        <form action="/adminDashboard/findUser" method="get" class="form">-->
+<!--            <label>Username:</label>-->
+<!--            <input type="text" name="username" required class="input">-->
+<!--            <button type="submit" class="button primary-button">Find</button>-->
+<!--        </form>-->
+<!--        <div th:if="${foundUser}" class="user-details">-->
+<!--            <h3>User Details</h3>-->
+<!--            <p>ID: <span th:text="${foundUser.userId}"></span></p>-->
+<!--            <p>Username: <span th:text="${foundUser.username}"></span></p>-->
+<!--            <p>Email: <span th:text="${foundUser.email}"></span></p>-->
+<!--        </div>-->
+<!--        <div th:if="${error}" class="error-message">-->
+<!--            <p th:text="${error}"></p>-->
+<!--        </div>-->
+<!--    </section>-->
+
+    <section class="card">
+        <h2>Update User Password</h2>
+        <form action="/adminDashboard/updatePassword" method="post" class="form">
+            <label>User ID:</label>
+            <input type="number" name="userId" required class="input">
+            <label>New Password:</label>
+            <input type="password" name="newPassword" required class="input">
+            <button type="submit" class="button primary-button">Update</button>
+        </form>
+        <div th:if="${success}" class="success-message">
+            <p th:text="${success}"></p>
+        </div>
+    </section>
+</main>
 </body>
 </html>
